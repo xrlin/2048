@@ -31,6 +31,11 @@ func (stage *Stage) Move(direction string) {
 	stage.draw()
 }
 
+
+func (stage *Stage) GameOver() bool {
+	return stage.entity.GameOver()
+}
+
 func (stage *Stage) FieldWidth() int {
 	return stage.entity.Width
 }
@@ -48,8 +53,16 @@ func (stage *Stage) fieldWidget() *ui.Row {
 	return ui.NewCol(2, 0, table)
 }
 
+func (stage *Stage) Status() string {
+	ret := "Playing..."
+	if stage.GameOver() {
+		ret = "GameOver"
+	}
+	return ret
+}
+
 func (stage *Stage) infoWidget() *ui.Row {
-	info := "Score: " +  strconv.Itoa(stage.entity.Score) + "\n\n\n"+ "Playing...\n\n\n\nUse w, a, s, d or\n left, right, up, down arrow to control;\n r to reset[fg-red]"
+	info := "Score: " +  strconv.Itoa(stage.entity.Score) + "\n\n\n"+  stage.Status() + "\n\n\n\nUse w, a, s, d or\n left, right, up, down arrow to control;\n r to reset[fg-red]"
 	par := ui.NewPar(info)
 	par.BorderLabel = "Info"
 	par.Border = false
@@ -77,6 +90,12 @@ func (stage *Stage) draw()  {
 	ui.Render(ui.Body)
 }
 
+func (stage *Stage) Reset() {
+	logger.Println("resetint...")
+	stage.entity.Reset()
+	stage.draw()
+}
+
 func (stage *Stage) listen() {
 	// handle key q pressing
 	ui.Handle("/sys/kbd/q", func(ui.Event) {
@@ -86,15 +105,16 @@ func (stage *Stage) listen() {
 
 	ui.Handle("/sys/kbd", func(e ui.Event) {
 		switch e.Path {
-		case "/sys/kbd/<left>", "/sys/kbd/<a>":
+		case "/sys/kbd/<left>", "/sys/kbd/a":
 			stage.Move("left")
-
-		case "/sys/kbd/<right>", "/sys/kbd/<d>":
+		case "/sys/kbd/<right>", "/sys/kbd/d":
 			stage.Move("right")
-		case "/sys/kbd/<up>", "/sys/kbd/<w>":
+		case "/sys/kbd/<up>", "/sys/kbd/w":
 			stage.Move("up")
-		case "/sys/kbd/<down>", "/sys/kbd/<s>":
+		case "/sys/kbd/<down>", "/sys/kbd/s":
 			stage.Move("down")
+		case "/sys/kbd/r":
+			stage.Reset()
 		}
 	})
 }

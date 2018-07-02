@@ -23,6 +23,7 @@ func (g *Entity) InitFields() {
 
 func (g *Entity) Reset() {
 	g.InitFields()
+	g.Score = 0
 }
 
 func (g *Entity) blankFields() (ret [][2]int) {
@@ -51,7 +52,11 @@ func (g *Entity) spawnValue() {
 	g.Field[row][col] = newVal
 }
 
-func moveLeft(field [][]int) [][]int {
+func (g *Entity) addScore(v int) {
+	g.Score += v
+}
+
+func moveLeft(field [][]int, g *Entity) [][]int {
 	mergeRow := func(row []int) {
 		for i, v := range row {
 			if i+1 >= len(row) {
@@ -64,6 +69,9 @@ func moveLeft(field [][]int) [][]int {
 			if row[i+1] == v {
 				row[i] += row[i+1]
 				row[i+1] = 0
+				if g != nil {
+					g.addScore(v << 1)
+				}
 			}
 		}
 	}
@@ -74,30 +82,42 @@ func moveLeft(field [][]int) [][]int {
 	return compressedField
 }
 
-func moveRight(field [][]int) [][]int {
-	return invert(moveLeft(invert(field)))
+func moveRight(field [][]int, g *Entity) [][]int {
+	return invert(moveLeft(invert(field), g))
 }
 
 func (g *Entity) MoveLeft() {
-	newFiled := moveLeft(g.Field)
+	if g.GameOver() {
+		return
+	}
+	newFiled := moveLeft(g.Field, g)
 	g.Field = newFiled
 	g.spawnValue()
 }
 
 func (g *Entity) MoveRight() {
-	newField := moveRight(g.Field)
+	if g.GameOver() {
+		return
+	}
+	newField := moveRight(g.Field, g)
 	g.Field = newField
 	g.spawnValue()
 }
 
 func (g *Entity) MoveUp() {
-	newField := transpose(moveLeft(transpose(g.Field)))
+	if g.GameOver() {
+		return
+	}
+	newField := transpose(moveLeft(transpose(g.Field), g))
 	g.Field = newField
 	g.spawnValue()
 }
 
 func (g *Entity) MoveDown() {
-	newField := transpose(moveRight(transpose(g.Field)))
+	if g.GameOver() {
+		return
+	}
+	newField := transpose(moveRight(transpose(g.Field), g))
 	g.Field = newField
 	g.spawnValue()
 }
@@ -110,7 +130,7 @@ func (g *Entity) GameOver() bool {
 		return false
 	}
 	for i := 0; i < g.Width; i++ {
-		for j := 0; i < g.Width; i++ {
+		for j := 0; j < g.Width; j++ {
 			if (i-1 >= 0 && g.Field[i][j] == g.Field[i-1][j]) ||
 				(i+1 < g.Width && g.Field[i][j] == g.Field[i+1][j]) ||
 				(j+1 < g.Width && g.Field[i][j] == g.Field[i][j+1]) {

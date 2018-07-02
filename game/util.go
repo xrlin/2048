@@ -3,6 +3,8 @@ package game
 import (
 	"time"
 	"math/rand"
+	"log"
+	"os"
 )
 
 func compress(field [][]int) [][]int {
@@ -57,4 +59,11 @@ func transpose(field [][]int) [][]int {
 func random(min, max int) int {
 	rand.Seed(time.Now().Unix())
 	return rand.Intn(max - min) + min
+}
+
+var logger *log.Logger
+
+func init() {
+	file, _ := os.OpenFile("dev.log", os.O_RDWR|os.O_CREATE, 0600)
+	logger = log.New(file, "", log.Llongfile|log.LstdFlags)
 }
