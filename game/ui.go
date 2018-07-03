@@ -13,10 +13,12 @@ type Stage struct {
 // RegisterEntity add the entity for Stage.
 // Must call this method first after Stage struct created
 func (stage *Stage) RegisterEntity(entity *Entity) {
-	entity.InitFields()
+	entity.InitField()
 	stage.entity = entity
 }
 
+// Move is a proxy of Entity's move.
+// Call corresponding move method with direction.
 func (stage *Stage) Move(direction string) {
 	switch direction {
 	case "left":
@@ -36,13 +38,15 @@ func (stage *Stage) GameOver() bool {
 	return stage.entity.GameOver()
 }
 
+// Return the filed's width
 func (stage *Stage) FieldWidth() int {
 	return stage.entity.Width
 }
 
+// Display the field
 func (stage *Stage) fieldWidget() *ui.Row {
 	table := ui.NewTable()
-	table.Rows = stage.Rows()
+	table.Rows = stage.rows()
 	table.FgColor = ui.ColorWhite
 	table.BgColor = ui.ColorDefault
 	table.TextAlign = ui.AlignCenter
@@ -53,6 +57,7 @@ func (stage *Stage) fieldWidget() *ui.Row {
 	return ui.NewCol(2, 0, table)
 }
 
+// Status return the corresponding string representing the status of the game.
 func (stage *Stage) Status() string {
 	ret := "Playing..."
 	if stage.GameOver() {
@@ -61,6 +66,7 @@ func (stage *Stage) Status() string {
 	return ret
 }
 
+// Display game info.
 func (stage *Stage) infoWidget() *ui.Row {
 	info := "Score: " +  strconv.Itoa(stage.entity.Score) + "\n\n\n"+  stage.Status() + "\n\n\n\nUse w, a, s, d or\n left, right, up, down arrow to control;\n r to reset[fg-red]"
 	par := ui.NewPar(info)
@@ -72,15 +78,6 @@ func (stage *Stage) infoWidget() *ui.Row {
 	return ui.NewCol(6, 0, par)
 }
 
-func (stage *Stage) StatusWidget() *ui.Row {
-	info := "Score: " +  strconv.Itoa(stage.entity.Score) + "\n\n\n"+ "Playing...\n\n\n\nUse w, a, s, d or left, right, up, down arrow to control; r to reset[fg-red]"
-	par := ui.NewPar(info)
-	par.BorderLabel = "Status"
-	par.Height = 10
-	par.BorderFg = ui.ColorBlue
-	return ui.NewCol(2, 0, par)
-}
-
 func (stage *Stage) draw()  {
 	// avoid deprecated render
 	ui.Body.Rows = make([]*ui.Row, 0)
@@ -90,12 +87,14 @@ func (stage *Stage) draw()  {
 	ui.Render(ui.Body)
 }
 
+// Reset the game
 func (stage *Stage) Reset() {
 	logger.Println("resetint...")
 	stage.entity.Reset()
 	stage.draw()
 }
 
+// Listen for keyboard event and call the corresponding procedure.
 func (stage *Stage) listen() {
 	// handle key q pressing
 	ui.Handle("/sys/kbd/q", func(ui.Event) {
@@ -119,7 +118,7 @@ func (stage *Stage) listen() {
 	})
 }
 
-func (stage *Stage) Rows() [][]string {
+func (stage *Stage) rows() [][]string {
 	ret := make([][]string, stage.FieldWidth())
 	for i, row := range stage.entity.Field {
 		strRow := make([]string, len(row))
@@ -132,6 +131,7 @@ func (stage *Stage) Rows() [][]string {
 	return ret
 }
 
+// Run start the game and stays in game's main loop
 func (stage *Stage) Run() {
 	err := ui.Init()
 	if err != nil {

@@ -7,7 +7,8 @@ import (
 	"os"
 )
 
-func compress(field [][]int) [][]int {
+// Compress align the non blank field to a side.
+func Compress(field [][]int) [][]int {
 	ret := make([][]int, len(field))
 	for i, v := range field {
 		row := make([]int, len(v))
@@ -24,7 +25,8 @@ func compress(field [][]int) [][]int {
 	return ret
 }
 
-func invert(field [][]int) [][]int {
+// Invert swap the value of all rows in field from left to right.
+func Invert(field [][]int) [][]int {
 	rows := len(field)
 	if rows == 0 {
 		return field
@@ -42,7 +44,8 @@ func invert(field [][]int) [][]int {
 	return ret
 }
 
-func transpose(field [][]int) [][]int {
+// Transpose the two dimension slice just like the transpose operator of matrix.
+func Transpose(field [][]int) [][]int {
 	rows := len(field)
 	cols := len(field[0])
 	ret := make([][]int, cols)
@@ -56,7 +59,8 @@ func transpose(field [][]int) [][]int {
 	return ret
 }
 
-func random(min, max int) int {
+// Random returns the number between min and max
+func Random(min, max int) int {
 	rand.Seed(time.Now().Unix())
 	return rand.Intn(max - min) + min
 }

@@ -4,6 +4,8 @@ import (
 	"math/rand"
 )
 
+// The Entity struct contains the game's field, score etc.
+// Realize the game logic.
 type Entity struct {
 	Field  [][]int
 	Target int
@@ -11,7 +13,8 @@ type Entity struct {
 	Score int
 }
 
-func (g *Entity) InitFields() {
+// InitField init the fields for g.
+func (g *Entity) InitField() {
 	field := make([][]int, g.Width)
 	for i := 0; i < g.Width; i++ {
 		field[i] = make([]int, g.Width)
@@ -21,11 +24,13 @@ func (g *Entity) InitFields() {
 	g.spawnValue()
 }
 
+// Reset will reset the Field and Score.
 func (g *Entity) Reset() {
-	g.InitFields()
+	g.InitField()
 	g.Score = 0
 }
 
+// blankFields return the fields with blank(zero) value.
 func (g *Entity) blankFields() (ret [][2]int) {
 	for i := 0; i < g.Width; i++ {
 		for j := 0; j < g.Width; j++ {
@@ -37,6 +42,7 @@ func (g *Entity) blankFields() (ret [][2]int) {
 	return
 }
 
+// spawnValue generates a value, 2 or 4 in 9 to 1 ratio, and set it in a Random blank field.
 func (g *Entity) spawnValue() {
 	newVal := 2
 	// 1/9 probability to spawnValue 4
@@ -47,7 +53,7 @@ func (g *Entity) spawnValue() {
 	if len(blanks) == 0 {
 		return
 	}
-	blank := blanks[random(0, len(blanks))]
+	blank := blanks[Random(0, len(blanks))]
 	row, col := blank[0], blank[1]
 	g.Field[row][col] = newVal
 }
@@ -56,6 +62,8 @@ func (g *Entity) addScore(v int) {
 	g.Score += v
 }
 
+// moveLeft is a helper method to move left and merge the adjacent value with same value.
+// Add up the scores according the values after merged
 func moveLeft(field [][]int, g *Entity) [][]int {
 	mergeRow := func(row []int) {
 		for i, v := range row {
@@ -75,17 +83,19 @@ func moveLeft(field [][]int, g *Entity) [][]int {
 			}
 		}
 	}
-	compressedField := compress(field)
+	compressedField := Compress(field)
 	for _, row := range compressedField {
 		mergeRow(row)
 	}
 	return compressedField
 }
 
+// Move right. Just opposite with move left.
 func moveRight(field [][]int, g *Entity) [][]int {
-	return invert(moveLeft(invert(field), g))
+	return Invert(moveLeft(Invert(field), g))
 }
 
+// MoveLeft merge and move left the field and update the score in g.
 func (g *Entity) MoveLeft() {
 	if g.GameOver() {
 		return
@@ -95,6 +105,7 @@ func (g *Entity) MoveLeft() {
 	g.spawnValue()
 }
 
+// MoveRight check and call moveRight then up the field in g.
 func (g *Entity) MoveRight() {
 	if g.GameOver() {
 		return
@@ -104,24 +115,29 @@ func (g *Entity) MoveRight() {
 	g.spawnValue()
 }
 
+// MoveUp up merge the corresponding fields and update it.
+// Transpose and move right on the filed like matrix and finally get the result equal to moveRight.
 func (g *Entity) MoveUp() {
 	if g.GameOver() {
 		return
 	}
-	newField := transpose(moveLeft(transpose(g.Field), g))
+	newField := Transpose(moveLeft(Transpose(g.Field), g))
 	g.Field = newField
 	g.spawnValue()
 }
 
+// MoveDown down merge the corresponding fields and update it.
+// Transpose and move right on the filed like matrix and finally get the result equal to moveRight.
 func (g *Entity) MoveDown() {
 	if g.GameOver() {
 		return
 	}
-	newField := transpose(moveRight(transpose(g.Field), g))
+	newField := Transpose(moveRight(Transpose(g.Field), g))
 	g.Field = newField
 	g.spawnValue()
 }
 
+// GameOver checks whether the game is over according whether it is any blank fields to move or adjacent fields can be merged.
 func (g *Entity) GameOver() bool {
 	if g.Win() {
 		return false
@@ -141,6 +157,7 @@ func (g *Entity) GameOver() bool {
 	return true
 }
 
+// Win check is the player reach the target of the game
 func (g *Entity) Win() bool {
 	for _, row := range g.Field {
 		for _, v := range row {
