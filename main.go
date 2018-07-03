@@ -1,7 +1,7 @@
 package main
 
 import (
-	"2048/game"
+	"github.com/xrlin/2048/game"
 )
 
 func main() {
