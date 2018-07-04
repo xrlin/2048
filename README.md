@@ -20,3 +20,5 @@ Then run
 $ 2048
 ```
 
+Just for fun :smile: :sparkles:
+
