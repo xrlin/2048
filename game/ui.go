@@ -68,7 +68,7 @@ func (stage *Stage) Status() string {
 
 // Display game info.
 func (stage *Stage) infoWidget() *ui.Row {
-	info := "Score: " +  strconv.Itoa(stage.entity.Score) + "\n\n\n"+  stage.Status() + "\n\n\n\nUse w, a, s, d or\n left, right, up, down arrow to control;\n r to reset[fg-red]"
+	info := "Score: " +  strconv.Itoa(stage.entity.Score) + "\n"+  stage.Status() + "\nUse w, a, s, d or\n left, right, up, down arrow to control;\n r to reset[fg-red]"
 	par := ui.NewPar(info)
 	par.BorderLabel = "Info"
 	par.Border = false
@@ -123,7 +123,6 @@ func (stage *Stage) rows() [][]string {
 	for i, row := range stage.entity.Field {
 		strRow := make([]string, len(row))
 		for j, v := range row {
-			//strRow[j] = "[" + strconv.Itoa(v) + "]" + "(fg-white,bg-black)"
 			strRow[j] =  strconv.Itoa(v)
 		}
 		ret[i] = strRow
