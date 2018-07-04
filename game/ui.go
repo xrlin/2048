@@ -34,11 +34,11 @@ func (stage *Stage) Move(direction string) {
 }
 
 
-func (stage *Stage) GameOver() bool {
+func (stage *Stage) gameOver() bool {
 	return stage.entity.GameOver()
 }
 
-// Return the filed's width
+// FieldWidth returns the filed's width
 func (stage *Stage) FieldWidth() int {
 	return stage.entity.Width
 }
@@ -60,7 +60,7 @@ func (stage *Stage) fieldWidget() *ui.Row {
 // Status return the corresponding string representing the status of the game.
 func (stage *Stage) Status() string {
 	ret := "Playing..."
-	if stage.GameOver() {
+	if stage.gameOver() {
 		ret = "GameOver"
 	}
 	return ret

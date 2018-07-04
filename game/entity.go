@@ -70,13 +70,15 @@ func moveLeft(field [][]int, g *Entity) [][]int {
 			if i+1 >= len(row) {
 				return
 			}
-			if row[i] == 0 {
-				row[i] = row[i+1]
-				row[i+1] = 0
-			}
 			if row[i+1] == v {
 				row[i] += row[i+1]
-				row[i+1] = 0
+				start := i+1
+				// move fields behind from right to left
+				for ;start + 1 < len(row); start++{
+					row[start] = row[start+1]
+				}
+				// fill zero value to the last value
+				row[start] = 0
 				if g != nil {
 					g.addScore(v << 1)
 				}
